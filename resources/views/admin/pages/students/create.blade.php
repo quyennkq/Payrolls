@@ -60,7 +60,7 @@
                                             <i class="fa fa-save"></i> @lang('Save')
                                         </button>
                                     </ul>
-            
+
                                     <div class="tab-content">
                                         <div class="tab-pane active" id="tab_1">
                                             <div class="d-flex-wap">
@@ -75,13 +75,13 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>@lang('Họ')<small class="text-red">*</small></label>
                                                         <input type="text" class="form-control" name="first_name" value="{{ old('first_name') }}" required>
                                                     </div>
-                                                </div> 
+                                                </div>
 
                                                 <div class="col-md-4">
                                                     <div class="form-group">
@@ -89,8 +89,8 @@
                                                         <input type="text" class="form-control" name="last_name" value="{{ old('last_name') }}" required>
                                                     </div>
                                                 </div>
-            
-                                                
+
+
 
                                                 <div class="col-md-4">
                                                     <div class="form-group">
@@ -98,8 +98,8 @@
                                                         <input type="text" class="form-control" name="nickname" value="{{ old('nickname') }}" >
                                                     </div>
                                                 </div>
-                                               
-            
+
+
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>@lang('Giới tính')</label>
@@ -110,7 +110,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-            
+
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>@lang('Ngày sinh')</label>
@@ -177,6 +177,6 @@
 
 @section('script')
     <script>
-        
+
     </script>
 @endsection

@@ -9,6 +9,14 @@
             max-width: 80%;
             width: auto;
         }
+        .tooltip-inner {
+            white-space: nowrap;
+            max-width: none;
+            text-align: left
+        }
+        .table-bordered>thead>tr>th{
+            vertical-align: middle;
+        }
     </style>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content-header'); ?>
@@ -90,6 +98,19 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
+                                <label><?php echo app('translator')->get('Loại'); ?></label>
+                                <select name="type_receipt" class="form-control select2 w-100">
+                                    <option value=""><?php echo app('translator')->get('Please select'); ?></option>
+                                    <?php $__currentLoopData = $type_receipt; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($key); ?>"
+                                            <?php echo e(isset($params['type_receipt']) && $params['type_receipt'] == $key ? 'selected' : ''); ?>>
+                                            <?php echo e(__($val)); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
                                 <label><?php echo app('translator')->get('Ngày tạo'); ?></label>
                                 <input type="date" name="created_at" class="form-control"
                                     value="<?php echo e($params['created_at'] ?? ''); ?>">
@@ -122,8 +143,9 @@
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title"><?php echo app('translator')->get('List'); ?></h3>
+
             </div>
-            <div class="box-body box_alert">
+            <div class="box-body box_alert table-responsive">
                 <?php if(session('errorMessage')): ?>
                     <div class="alert alert-warning alert-dismissible">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -161,7 +183,10 @@
                                 <th><?php echo app('translator')->get('STT'); ?></th>
                                 <th><?php echo app('translator')->get('Mã TBP'); ?></th>
                                 <th><?php echo app('translator')->get('Tên TBP'); ?></th>
-                                <th><?php echo app('translator')->get('Học sinh'); ?></th>
+                                <th><?php echo app('translator')->get('Loại TBP'); ?></th>
+                                <th><?php echo app('translator')->get('Mã học sinh'); ?></th>
+                                <th><?php echo app('translator')->get('Tên học sinh'); ?></th>
+                                <th><?php echo app('translator')->get('Lớp'); ?></th>
                                 <th><?php echo app('translator')->get('Khu vực'); ?></th>
                                 
                                 <th><?php echo app('translator')->get('Thành tiền'); ?></th>
@@ -169,7 +194,12 @@
                                 <th><?php echo app('translator')->get('Số dư kỳ trước'); ?></th>
                                 <th><?php echo app('translator')->get('Tổng tiền thực tế'); ?></th>
                                 <th><?php echo app('translator')->get('Đã thu'); ?></th>
-                                <th><?php echo app('translator')->get('Số tiền còn phải thu (+) hoặc thừa (-)'); ?></th>
+                                <th>
+                                    <?php echo app('translator')->get('Cần thu'); ?>
+                                    <span data-html="true" data-toggle="tooltip"
+                                        title="Số tiền còn phải thu (+) hoặc thừa (-)">
+                                        <i class="fa fa-question-circle-o" aria-hidden="true"></i></span>
+                                </th>
                                 <th><?php echo app('translator')->get('Trạng thái'); ?></th>
                                 <th><?php echo app('translator')->get('Ghi chú'); ?></th>
                                 <th><?php echo app('translator')->get('Người tạo'); ?></th>
@@ -192,9 +222,21 @@
 
                                     </td>
                                     <td>
-                                        <?php echo e($row->student->student_code ?? ''); ?> - <?php echo e($row->student->first_name ?? ''); ?>
+                                        <?php echo e(__($row->type_receipt)); ?>
 
-                                        <?php echo e($row->student->last_name ?? ''); ?>(<?php echo e($row->student->nickname ?? ''); ?>)
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->student->student_code ?? ''); ?>
+
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->student->first_name ?? ''); ?>
+
+                                        <?php echo e($row->student->last_name ?? ''); ?> (<?php echo e($row->student->nickname ?? ''); ?>)
+                                    </td>
+                                    <td>
+                                        <?php echo e(optional($row->student->currentClass)->name); ?>
+
                                     </td>
                                     <td>
                                         <?php echo e($row->area->name ?? ''); ?>
@@ -254,8 +296,9 @@
                                             title="<?php echo app('translator')->get('Xem nhanh'); ?>" data-original-title="<?php echo app('translator')->get('Xem nhanh'); ?>">
                                             <i class="fa fa-eye"></i>
                                         </button>
-                                        <a class="btn btn-sm btn-warning" data-toggle="tooltip" title="<?php echo app('translator')->get('Chỉnh sửa'); ?>"
-                                            data-original-title="<?php echo app('translator')->get('Chỉnh sửa'); ?>" style="min-width: 34px"
+                                        <a class="btn btn-sm btn-warning" data-toggle="tooltip"
+                                            title="<?php echo app('translator')->get('Chỉnh sửa'); ?>" data-original-title="<?php echo app('translator')->get('Chỉnh sửa'); ?>"
+                                            style="min-width: 34px"
                                             href="<?php echo e(route(Request::segment(2) . '.show', $row->id)); ?>">
                                             <i class="fa fa-pencil"></i>
                                         </a>

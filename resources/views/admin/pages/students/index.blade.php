@@ -10,7 +10,7 @@
     <section class="content-header">
         <h1>
             @lang($module_name)
-            {{-- <a class="btn btn-sm btn-warning pull-right" href="{{ route(Request::segment(2) . '.create') }}"><i
+            {{-- <a class="btn btn-sm btn-warning pull-right" href="{{ route(Request::segment(5) . '.create') }}"><i
                     class="fa fa-plus"></i> @lang('Thêm mới học sinh')</a> --}}
         </h1>
     </section>

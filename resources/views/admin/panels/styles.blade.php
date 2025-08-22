@@ -994,4 +994,166 @@
         padding-inline-start: 15px;
         margin-bottom: 0px;
     }
+
+    /* style của Quyến */
+    .table>thead>tr>th,
+    .table>tbody>tr>td {
+        vertical-align: middle;
+    }
+
+    .box_radio {
+        width: 100%;
+        height: 100%;
+    }
+
+    input[type="radio"] {
+        transform: scale(1.5);
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .box_image {
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+    }
+
+    .box_image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .box_content {
+        width: calc(100% - 200px);
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .mb-20 {
+        margin-bottom: 20px;
+    }
+
+    .radiobox {
+        margin-top: 0px !important
+    }
+
+    @media (max-width: 768px) {
+        .box_content {
+            width: 100%;
+        }
+    }
+
+    .camera-container {
+        position: relative;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+    }
+
+    #video {
+        width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .controls {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Updated Search Form and Action Buttons Styling */
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
+        padding: 15px;
+    }
+
+    .filter-row .form-group {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-row .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .filter-row .form-control {
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        padding: 8px 12px;
+        height: 38px;
+    }
+
+    .filter-row .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+    .filter-row .action-btn {
+        padding: 8px 20px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .action-buttons form,
+    .action-buttons a {
+        margin: 0;
+    }
+
+    .action-buttons .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .action-buttons .btn i {
+        font-size: 14px;
+    }
+
+    .action-buttons .btn-sm {
+        height: 38px;
+    }
+
+    @media (max-width: 576px) {
+        .filter-row .form-group {
+            min-width: 100%;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Consts;
+use App\Models\Health;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -146,5 +147,18 @@ class Student extends Model
     public function studentPromotions()
     {
         return $this->hasMany(StudentPromotion::class, 'student_id', 'id');
+    }
+    // Mối quan hệ với bảng Health
+    public function health()
+    {
+        return $this->hasOne(Health::class, 'student_id', 'id');
+    }
+    public function latestHealth()
+    {
+        return $this->hasOne(Health::class, 'student_id')->orderByDesc('created_at');
+    }
+    public function extracurricular()
+    {
+        return $this->hasOne(Extracurricular::class, 'student_id', 'id');
     }
 }

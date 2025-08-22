@@ -1,5 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\ExtracurricularController;
+use App\Http\Controllers\Admin\HealthController;
+use App\Http\Controllers\Admin\LeaveBalanceController;
+use App\Http\Controllers\Admin\LeaveRequestController;
+use App\Http\Controllers\Admin\PayrollController;
+use App\Http\Controllers\Admin\SalaryPaymentController;
+use App\Models\LeaveBalance;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 /*
@@ -111,7 +119,7 @@ Route::group(['namespace' => 'Admin'], function () {
                 'receipt' => 'ReceiptController',
                 'receipt_adjustment' => 'ReceiptAdjustmentController',
                 'receipt_transaction' => 'ReceiptTransactionController',
-                'attendance' => 'AttendancesController',
+                // 'attendance' => 'AttendancesController',
                 'promotions' => 'PromotionController',
                 'suppliers' => 'MealSupplierController',
                 'units' => 'MealUnitController',
@@ -148,7 +156,7 @@ Route::group(['namespace' => 'Admin'], function () {
             Route::get('mealmenu/report-by-week', 'MealMenuDailyController@reportByWeek')->name('mealmenu.week.report');
             // Sổ báo ăn
             Route::get('mealmenu/calendar-month', 'MealMenuDailyController@calendarByMonth')->name('meal-menu-daily.calendar-by-month');
-            
+
             Route::get('attendance/check-out/index', 'AttendancesController@checkout')->name('attendance.checkout');
             Route::get('attendance/summary-by-month/index', 'AttendancesController@attendanceSummaryByMonth')->name('attendance.summary_by_month');
             Route::post('attendance/summary-by-month/update_or_store', 'AttendancesController@updateOrstoreAttendance')->name('attendance.summary_by_month.update_or_store');
@@ -426,4 +434,89 @@ Route::group(['namespace' => 'Admin'], function () {
     // test drive google
     Route::get('/google-drive', 'GoogleDriveController@index')->name('google_drive.index');
     Route::post('/google-drive/upload', 'GoogleDriveController@upload')->name('google_drive.upload');
+
+
+    //test
+    // Route::get('health', [HealthController::class, 'index'])->name('admin.health.index');
+    // Route::get('health/create', [HealthController::class, 'create'])->name('admin.health.create');
+    // Route::post('health', [HealthController::class, 'store'])->name('admin.health.store');
+    // Route::get('health/{id}', [HealthController::class, 'show'])->name('admin.health.show');
+    // Route::put('health/{id}/edit', [HealthController::class, 'edit'])->name('admin.health.edit');
+    // Route::put('health/{id}', [HealthController::class, 'update'])->name('admin.health.update');
+    // Route::delete('health/{id}', [HealthController::class, 'destroy'])->name('admin.health.destroy');
+
+    Route::get('/health', 'HealthController@index')->name('health.index');
+    Route::get('/health/{id}/create', 'HealthController@create')->name('health.create');
+    Route::post('/health/{id}/store', 'HealthController@store')->name('health.store');
+    Route::get('/health/{id}/show','HealthController@show')->name('health.show');
+    Route::get('/health/{id}/edit', 'HealthController@edit')->name('health.edit');
+    Route::put('/health/{id}', 'HealthController@update')->name('health.update');
+    Route::delete('/health/{id}/delete', 'HealthController@destroy')->name('health.destroy');
+            // ------
+
+
+    Route::get('/extracurricular', 'ExtracurricularController@index')->name('extracurricular.index');
+    Route::get('/extracurricular/create', 'ExtracurricularController@create')->name('extracurricular.create');
+    Route::post('/extracurricular/store', 'ExtracurricularController@store')->name('extracurricular.store');
+    Route::get('/extracurricular/{id}/show','ExtracurricularController@show')->name('extracurricular.show');
+
+    //Quản lý lương cho nhân viên
+    Route::get('/salary', 'SalaryController@index')->name('salary.index');
+    Route::get('/salary/create', 'SalaryController@create')->name('salary.create');
+    Route::post('/salary/store', 'SalaryController@store')->name('salary.store');
+    Route::get('/salary/{id}/show', 'SalaryController@show')->name('salary.show');
+    Route::get('/salary/{id}/edit', 'SalaryController@edit')->name('salary.edit');
+    Route::put('/salary/{id}', 'SalaryController@update')->name('salary.update');
+    Route::delete('/salary/{id}/delete', 'SalaryController@destroy')->name('salary.destroy');
+
+    //Quản lý bảng chấm công cho nhân viên
+    Route::get('/attendance',[AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
+    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/attendance/{id}/show', [AttendanceController::class, 'show'])->name('attendance.show');
+    Route::get('/attendance/{id}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
+    Route::put('/attendance/{id}', [AttendanceController::class, 'update'])->name('attendance.update');
+    Route::delete('/attendance/delete/{id}', [AttendanceController::class, 'destroy'])->name('attendance.delete');
+    Route::post('/attendance/import', [AttendanceController::class, 'import'])->name('attendance.import');
+
+    //Quản lí bảng mức lương cho nhân viên
+    Route::get('/salary_payment',[SalaryPaymentController::class, 'index'])->name('salary_payment.index');
+    Route::get('/salary_payment/create', [SalaryPaymentController::class, 'create'])->name('salary_payment.create');
+    Route::post('/salary_payment/store', [SalaryPaymentController::class, 'store'])->name('salary_payment.store');
+    Route::get('/salary_payment/{id}/show', [SalaryPaymentController::class, 'show'])->name('salary_payment.show');
+    Route::get('/salary_payment/{id}/edit', [SalaryPaymentController::class, 'edit'])->name('salary_payment.edit');
+    Route::put('/salary_payment/{id}', [SalaryPaymentController::class, 'update'])->name('salary_payment.update');
+    Route::delete('/salary_payment/delete/{id}', [SalaryPaymentController::class, 'destroy'])->name('salary_payment.delete');
+    Route::post('/salary_payment/import', [SalaryPaymentController::class, 'import'])->name('salary_payment.import');
+
+    //Quản lí đơn xin nghỉ phép cho nhân viên
+    Route::get('/leave_request',[LeaveRequestController::class, 'index'])->name('leave_request.index');
+    Route::get('/leave_request/create', [LeaveRequestController::class, 'create'])->name('leave_request.create');
+    Route::post('/leave_request/store', [LeaveRequestController::class, 'store'])->name('leave_request.store');
+    Route::get('/leave_request/{id}/show', [LeaveRequestController::class, 'show'])->name('leave_request.show');
+    Route::get('/leave_request/{id}/edit', [LeaveRequestController::class, 'edit'])->name('leave_request.edit');
+    Route::put('/leave_request/{id}', [LeaveRequestController::class, 'update'])->name('leave_request.update');
+    Route::delete('/leave_request/delete/{id}', [LeaveRequestController::class, 'destroy'])->name('leave_request.delete');
+    Route::post('/leave_request/import', [LeaveRequestController::class, 'import'])->name('leave_request.import');
+
+    //Quản lí số lượt nghỉ phép cho nhân viên
+    Route::get('/leave_balance',[LeaveBalanceController::class, 'index'])->name('leave_balance.index');
+    Route::get('/leave_balance/create', [LeaveBalanceController::class, 'create'])->name('leave_balance.create');
+    Route::post('/leave_balance/store', [LeaveBalanceController::class, 'store'])->name('leave_balance.store');
+    Route::get('/leave_balance/{id}/show', [LeaveBalanceController::class, 'show'])->name('leave_balance.show');
+    Route::get('/leave_balance/{id}/edit', [LeaveBalanceController::class, 'edit'])->name('leave_balance.edit');
+    Route::put('/leave_balance/{id}', [LeaveBalanceController::class, 'update'])->name('leave_balance.update');
+    Route::delete('/leave_balance/delete/{id}', [LeaveBalanceController::class, 'destroy'])->name('leave_balance.delete');
+    Route::post('/leave_balance/import', [LeaveBalanceController::class, 'import'])->name('leave_balance.import');
+
+     //Quản lí bảng lương cho nhân viên
+    Route::get('/payroll',[PayrollController::class, 'index'])->name('payroll.index');
+    Route::get('/payroll/create', [PayrollController::class, 'create'])->name('payroll.create');
+    Route::post('/payroll/store', [PayrollController::class, 'store'])->name('payroll.store');
+    Route::get('/payroll/{id}/show', [PayrollController::class, 'show'])->name('payroll.show');
+    Route::get('/payroll/{id}/edit', [PayrollController::class, 'edit'])->name('payroll.edit');
+    Route::put('/payroll/{id}', [PayrollController::class, 'update'])->name('payroll.update');
+    Route::delete('/payroll/destroy/{id}', [PayrollController::class, 'destroy'])->name('payroll.destroy');
+    Route::post('/payroll/import', [PayrollController::class, 'import'])->name('payroll.import');
 });
+
