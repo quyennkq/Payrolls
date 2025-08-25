@@ -32,6 +32,20 @@ class Admin extends Authenticatable
         'avatar',
         'json_params',
     ];
+    public function salaryPayments() {
+        return $this->hasMany(SalaryPayment::class, 'employee_id');
+    }
+    public function attendances() {
+        return $this->hasMany(AttendanceEmployee::class, 'employee_id');
+    }
+    public function leaveRequests() {
+        return $this->hasMany(LeaveRequestSalary::class, 'employee_id');
+    }
+    public function leaveBalance()
+    {
+        return $this->hasMany(LeaveBalanceSalary::class, 'employee_id');
+    }
+
     protected $casts = [
         'json_params' => 'object',
     ];

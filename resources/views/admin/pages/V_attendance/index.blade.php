@@ -39,6 +39,13 @@
                                 value="{{ isset($params['employee_id']) ? $params['employee_id'] : '' }}">
                         </div>
 
+                        {{-- ✅ Thêm chọn tháng --}}
+                        <div class="form-group">
+                            <label class="form-label">@lang('Chọn tháng')</label>
+                            <input type="month" class="form-control" name="month"
+                                value="{{ isset($params['month']) ? $params['month'] : date('Y-m') }}">
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">@lang('Từ')</label>
                             <input type="date" class="form-control" name="form_date"
@@ -65,14 +72,15 @@
                             <a class="btn btn-default action-btn"
                                 href="{{ route(Request::segment(2) . '.index') }}">@lang('Reset')</a>
                         </div>
-
                     </div>
                 </div>
             </form>
+
             <div class="d-flex align-items-center gap-2" style="margin: 21px">
                 <form action="{{ route('attendance.import') }}" method="POST" enctype="multipart/form-data"
                     class="d-flex align-items-center gap-2" style="margin-bottom: 21px">
                     @csrf
+
                     <input type="file" name="excel_file" class="form-control form-control-sm" style="height: 38px;"
                         required>
                     <button type="submit" class="btn btn-warning btn-sm" style="margin-left: 10px;">
@@ -114,82 +122,79 @@
                         @lang('not_found')
                     </div>
                 @else
-                    <form id="attendance-form" method="POST">
-                        @csrf
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered">
-                                <thead>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">@lang('STT')</th>
+                                    <th class="text-center">@lang('Mã nhân viên')</th>
+                                    <th class="text-center">@lang('Tên nhân viên')</th>
+                                    <th class="text-center">@lang('Thời gian vào')</th>
+                                    <th class="text-center">@lang('Thời gian ra')</th>
+                                    <th class="text-center">@lang('Số giờ làm việc')</th>
+                                    <th class="text-center">@lang('Ngày công chuẩn')</th>
+                                    <th class="text-center">@lang('Công thử việc')</th>
+                                    <th class="text-center">@lang('Công chính thức')</th>
+                                    <th class="text-center">@lang('Thao tác')</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($rows as $row)
                                     <tr>
-                                        <th class="text-center">@lang('STT')</th>
-                                        <th class="text-center">@lang('Mã nhân viên')</th>
-                                        <th class="text-center">@lang('Tên nhân viên')</th>
-                                        <th class="text-center">@lang('Thời gian vào')</th>
-                                        <th class="text-center">@lang('Thời gian ra')</th>
-                                        <th class="text-center">@lang('Số giờ làm việc')</th>
-                                        <th class="text-center">@lang('Ngày công chuẩn')</th>
-                                        <th class="text-center">@lang('Công thử việc')</th>
-                                        <th class="text-center">@lang('Công chính thức')</th>
-                                        <th class="text-center">@lang('Thao tác')</th>
+                                        <td>{{ $loop->index + 1 }}</td>
+                                        <td>
+                                            {{ $row->employee_id ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->admin->name ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->check_in ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->check_out ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->work_hours ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->standard_working_days ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->probation_days ?? '' }}
+                                        </td>
+                                        <td>
+                                            {{ $row->official_days ?? '' }}
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-primary"
+                                                href="{{ route('attendance.show', $row->id) }}" data-toggle="tooltip"
+                                                title="@lang('Chi tiết')" data-original-title="@lang('Chi tiết')"
+                                                onclick="return openCenteredPopup(this.href)">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-warning" data-toggle="tooltip"
+                                                title="@lang('Update')" data-original-title="@lang('Update')"
+                                                href="{{ route('attendance.edit', $row->id) }}">
+                                                <i class="fa fa-pencil-square-o"></i>
+                                            </a>
+                                            <form action="{{ route('attendance.delete', $row->id) }}" method="POST"
+                                                style="display: inline-block;"
+                                                onsubmit="return confirm('@lang('Bạn có chắc chắn muốn xóa?')');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-danger" type="submit"
+                                                    data-toggle="tooltip" title="@lang('Delete')"
+                                                    data-original-title="@lang('Delete')">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($rows as $row)
-                                        <tr>
-                                            <td>{{ $loop->index + 1 }}</td>
-                                            <td>
-                                                {{ $row->employee_id ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->user->first_name ?? '' }} {{ $row->user->last_name ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->check_in ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->check_out ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->work_hours ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->standard_working_days ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->probation_days ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->official_days ?? '' }}
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-sm btn-primary"
-                                                    href="{{ route('attendance.show', $row->id) }}" data-toggle="tooltip"
-                                                    title="@lang('Chi tiết')" data-original-title="@lang('Chi tiết')"
-                                                    onclick="return openCenteredPopup(this.href)">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-warning" data-toggle="tooltip"
-                                                    title="@lang('Update')" data-original-title="@lang('Update')"
-                                                    href="{{ route('attendance.edit', $row->id) }}">
-                                                    <i class="fa fa-pencil-square-o"></i>
-                                                </a>
-                                                <form action="{{ route('attendance.delete', $row->id) }}" method="POST"
-                                                    style="display: inline-block;"
-                                                    onsubmit="return confirm('@lang('Bạn có chắc chắn muốn xóa?')');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-sm btn-danger" type="submit"
-                                                        data-toggle="tooltip" title="@lang('Delete')"
-                                                        data-original-title="@lang('Delete')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @endif
             </div>
             <div class="box-footer clearfix">

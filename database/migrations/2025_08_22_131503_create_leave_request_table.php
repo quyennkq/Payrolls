@@ -15,11 +15,14 @@ class CreateLeaveRequestTable extends Migration
     {
         Schema::create('leave_request', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('users')->onDelete('cascade'); // Liên kết nhân viên
-            $table->date('leave_date'); // Ngày nghỉ
-            $table->string('leave_type'); // Loại nghỉ (ví dụ: có lương, không lương)
-            $table->text('reason')->nullable(); // Lý do nghỉ
+            $table->foreignId('employee_id')->constrained('admins')->onDelete('cascade'); // Liên kết nhân viên
+            $table->date('leave_date_start')->nullable(); // Ngày bắt đầu nghỉ
+            $table->date('leave_date_end')->nullable(); // Ngày kết thúc
+            $table->string('leave_type')->nullable(); // Loại nghỉ (ví dụ: có lương, không lương)
+            $table->text('reason')->nullable()->nullable(); // Lý do nghỉ
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending'); // Trạng thái
+            $table->json('json_params')->nullable();
+
             $table->timestamps();
         });
     }

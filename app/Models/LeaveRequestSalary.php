@@ -7,9 +7,9 @@ class LeaveRequestSalary extends Model
 {
     protected $table = 'leave_request';
 
-    public function user()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'employee_id', 'id');
+        return $this->belongsTo(Admin::class, 'employee_id', 'id');
     }
-    protected $fillable = ['employee_id', 'leave_date', 'leave_type', 'reason', 'status'];
+    protected $fillable = ['employee_id', 'leave_date_start','leave_date_end', 'leave_type', 'reason', 'status'];
 }

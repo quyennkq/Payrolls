@@ -2,8 +2,10 @@
 
 namespace App\Http\Services;
 
+use App\Models\Admin;
 use App\Models\Payroll;
 use App\Models\User;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PayrollService
@@ -15,7 +17,7 @@ class PayrollService
         foreach ($data[0] as $key => $row) {
             if ($key === 0) continue;
 
-            $employee = User::with('salaryPayments', 'attendances', 'leaveRequests')->find($row[0]);
+            $employee = Admin::with('salaryPayments', 'attendances', 'leaveRequests')->find($row[0]);
             if (!$employee) continue;
 
             $calculated = $this->calculatePayrollFields($employee, $row);
@@ -28,23 +30,59 @@ class PayrollService
     }
 
     // --- HÀM TÍNH TOÁN CHUNG ---
-    protected function calculatePayrollFields(User $employee, array $row = [])
+    protected function calculatePayrollFields(Admin $employee, array $row = [])
     {
-        // Lấy thông tin cơ bản
-        $allWorkDays = $employee->attendances()->orderByDesc('id')->value('standard_working_days') ?? 1;
-        $officialDays = $employee->attendances()->orderByDesc('id')->value('official_days') ?? 0;
+        // Lấy thông tin cơ bản theo tháng
+        $month = $row['month'] ?? $row[1] ?? null;
+        if (!$month) {
+            throw new \Exception('Month is required for payroll calculation');
+        }
 
+        try {
+            // ép string -> Carbon
+            $monthCarbon = Carbon::parse($month);
+        } catch (\Exception $e) {
+            throw new \Exception('Invalid month format, expected YYYY-MM-DD');
+        }
+
+        $allWorkDays = $employee->attendances()
+            ->whereMonth('check_in', $monthCarbon->month)
+            ->orderByDesc('id')
+            ->value('standard_working_days') ?? 1;
         $baseSalary = $employee->salaryPayments()->orderByDesc('id')->value('base_salary') ?? 0;
+        $officialDays = $employee->attendances()
+            ->whereMonth('check_in', $monthCarbon->month)
+            ->orderByDesc('id')->value('official_days') ?? 0;
 
-        // Tính ngày phép
-        foreach ($employee->leaveRequests as $leave) {
-            if ($leave->status === 'approved') {
-                if ($leave->leave_type === 'paid') {
-                    $officialDays += 1;
-                } elseif ($leave->leave_type === 'unpaid') {
-                    $officialDays -= 1;
-                }
+        $leaveRequests = $employee->leaveRequests()
+            ->where('status', 'approved')
+            ->where('leave_type', 'paid')
+            ->where(function ($q) use ($monthCarbon) {
+                // Chọn những đơn có khoảng nghỉ giao với tháng đang tính
+                $q->whereMonth('leave_date_start', $monthCarbon->month)
+                    ->whereYear('leave_date_start', $monthCarbon->year)
+                    ->orWhereMonth('leave_date_end', $monthCarbon->month)
+                    ->orWhereYear('leave_date_end', $monthCarbon->year);
+            })
+            ->get();
+
+        foreach ($leaveRequests as $leave) {
+            $start = Carbon::parse($leave->leave_date_start);
+            $end   = Carbon::parse($leave->leave_date_end);
+
+            // Nếu đơn nghỉ kéo dài sang tháng khác thì cắt khoảng ngày thuộc tháng cần tính
+            $startOfMonth = $monthCarbon->copy()->startOfMonth();
+            $endOfMonth   = $monthCarbon->copy()->endOfMonth();
+
+            if ($start < $startOfMonth) {
+                $start = $startOfMonth;
             }
+            if ($end > $endOfMonth) {
+                $end = $endOfMonth;
+            }
+
+            $days = $start->diffInDays($end) + 1;
+            $officialDays += $days;
         }
 
         $baseSalaryByDays = $baseSalary * $officialDays / $allWorkDays;
@@ -137,24 +175,24 @@ class PayrollService
 
     // --- CREATE / UPDATE THỦ CÔNG ---
     public function createOrUpdatePayroll(array $data, $id = null)
-{
-    $employee = User::with('salaryPayments', 'attendances', 'leaveRequests')->find($data['employee_id']);
-    if (!$employee) {
-        throw new \Exception("Employee not found");
-    }
+    {
+        $employee = Admin::with('salaryPayments', 'attendances', 'leaveRequests')->find($data['employee_id']);
+        if (!$employee) {
+            throw new \Exception("Employee not found");
+        }
 
-    $calculated = $this->calculatePayrollFields($employee, $data);
+        $calculated = $this->calculatePayrollFields($employee, $data);
 
-    if ($id) {
-        // Update bản ghi theo id
-        $payroll = Payroll::findOrFail($id);
-        $payroll->update(array_merge($data, $calculated));
-        return $payroll;
-    } else {
-        // Create mới
-        return Payroll::create(array_merge($data, $calculated));
+        if ($id) {
+            // Update bản ghi theo id
+            $payroll = Payroll::findOrFail($id);
+            $payroll->update(array_merge($data, $calculated));
+            return $payroll;
+        } else {
+            // Create mới
+            return Payroll::create(array_merge($data, $calculated));
+        }
     }
-}
 
 
     public function deletePayroll(int $id)

@@ -36,19 +36,29 @@
                                                 @foreach ($users as $user)
                                                     <option value="{{ $user->id }}"
                                                         {{ old('employee_id', $leave_request->employee_id ?? '') == $user->id ? 'selected' : '' }}>
-                                                        {{ $user->username }}
+                                                        {{ $user->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
 
-                                    {{-- Ngày nghỉ --}}
+                                    {{-- Ngày nghỉ bắt đầu--}}
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>@lang('Ngày nghỉ') <small class="text-red">*</small></label>
-                                            <input type="date" class="form-control" name="leave_date"
-                                                value="{{ old('leave_date', $leave_request->leave_date ?? '') }}"
+                                            <label>@lang('Ngày bắt đầu') <small class="text-red">*</small></label>
+                                            <input type="date" class="form-control" name="leave_date_start"
+                                                value="{{ old('leave_date_start', $leave_request->leave_date_start ?? '') }}"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    {{-- Ngày nghỉ kết thúc--}}
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>@lang('Ngày kết thúc') <small class="text-red">*</small></label>
+                                            <input type="date" class="form-control" name="leave_date_end"
+                                                value="{{ old('leave_date_end', $leave_request->leave_date_end ?? '') }}"
                                                 required>
                                         </div>
                                     </div>
@@ -110,3 +120,5 @@
             </div>
         </div>
 </form>
+
+

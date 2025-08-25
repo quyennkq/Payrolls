@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Payroll extends Model
 {
     protected $table = 'payroll';
-    public function user()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'employee_id', 'id');
+        return $this->belongsTo(Admin::class, 'employee_id', 'id');
     }
     protected $fillable = [
         'employee_id',
@@ -62,8 +62,8 @@ class Payroll extends Model
                 $date = Carbon::parse($value);
             }
 
-            // Lưu thành ngày đầu tháng
-            // $this->attributes['month'] = $date->startOfMonth()->format('Y-m-d');
+            //Lưu thành ngày đầu tháng
+            $this->attributes['month'] = $date->startOfMonth()->format('Y-m-d');
         } catch (\Exception $e) {
             $this->attributes['month'] = null;
         }

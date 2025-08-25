@@ -45,7 +45,7 @@
                                             <label>@lang('Tháng') <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="month"
                                                 value="{{ old('month', $payroll->month ?? '') }}"
-                                                placeholder="@lang('YYYY-MM')" pattern="\d{4}-\d{2}" required>
+                                                placeholder="@lang('YYYY-MM-DD')" pattern="\d{4}-\d{2}-\d{2}" required>
                                             @error('month')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror

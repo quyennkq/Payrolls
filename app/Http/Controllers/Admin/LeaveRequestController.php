@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Services\LeaveRequestService;
+use App\Models\Admin;
 use App\Models\LeaveRequest;
 use App\Models\LeaveRequestSalary;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class LeaveRequestController extends Controller
@@ -29,9 +31,16 @@ class LeaveRequestController extends Controller
             $query->where('employee_id', $request->employee_id);
         }
 
-        //lọc theo khoảng ngày
-        if ($request->filled('date')) {
-            $query->whereDate('leave_date', '=', $request->form_date);
+        if ($request->filled('month')) {
+            $month = Carbon::parse($request->month);
+            $query->whereMonth('leave_date_start', $month->month)
+                ->whereYear('leave_date_start', $month->year);
+        }
+          if ($request->filled('form_date')) {
+            $query->whereDate('created_at', '>=', $request->form_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -47,7 +56,7 @@ class LeaveRequestController extends Controller
     }
     public function create()
     {
-        $users = User::all();
+        $users = Admin::all();
         $this->responseData['users'] = $users;
         return $this->responseView($this->viewPart . '.create', $this->responseData);
     }
@@ -55,7 +64,8 @@ class LeaveRequestController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|integer',
-            'leave_date' => 'required|date|max:255',
+            'leave_date_start' => 'required|date|max:255',
+            'leave_date_end' => 'required|date|after_or_equal:leave_date_start',
             'leave_type' => 'required|string|max:50',
             'reason' => 'nullable|string|max:100',
             'status' => 'nullable|string',
@@ -66,7 +76,7 @@ class LeaveRequestController extends Controller
     }
     public function edit($id)
     {
-        $users = User::all();
+        $users = Admin::all();
         $leave_request = LeaveRequestSalary::findOrFail($id);
         $this->responseData['leave_request'] = $leave_request;
         $this->responseData['users'] = $users;
@@ -76,7 +86,8 @@ class LeaveRequestController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|integer',
-            'leave_date' => 'required|date|max:255',
+            'leave_date_start' => 'required|date|max:255',
+            'leave_date_end' => 'required|date|after_or_equal:leave_date_start',
             'leave_type' => 'required|string|max:50',
             'reason' => 'nullable|string|max:100',
             'status' => 'nullable|string',
@@ -88,6 +99,6 @@ class LeaveRequestController extends Controller
     {
         $leave_request = LeaveRequestSalary::findOrFail($id);
         $leave_request->delete();
-        return redirect()->route('leave_request.index')->with('successMessage','Xóa thành công');
+        return redirect()->route('leave_request.index')->with('successMessage', 'Xóa thành công');
     }
 }

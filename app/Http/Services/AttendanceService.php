@@ -2,7 +2,9 @@
 
 
 namespace App\Http\Services;
+
 use App\Models\Attendance;
+use App\Models\AttendanceEmployee;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
@@ -24,6 +26,8 @@ class AttendanceService
             $checkOutRaw          = $row[2] ?? null;
             $standardWorkingDays  = $row[4] ?? null;
             $probationDays        = $row[5] ?? 0;
+            $json_params          = $row[6] ?? null;
+            $status               = $row[7] ?? null;
 
             // convert giờ checkin - checkout
             $checkInObj  = $this->convertExcelDate($checkInRaw);
@@ -33,7 +37,7 @@ class AttendanceService
             $checkOut = $checkOutObj ? $checkOutObj->format('Y-m-d H:i:s') : null;
 
             // kiểm tra bản ghi đã có chưa
-            $existingAttendance = Attendance::where('employee_id', $employeeId)
+            $existingAttendance = AttendanceEmployee::where('employee_id', $employeeId)
                 ->whereDate('check_in', $checkInObj ? $checkInObj->format('Y-m-d') : null)
                 ->first();
 
@@ -43,6 +47,7 @@ class AttendanceService
                 'check_out'             => $checkOut,
                 'standard_working_days' => $standardWorkingDays,
                 'probation_days'        => $probationDays,
+
             ];
 
             if ($existingAttendance) {
@@ -82,12 +87,17 @@ class AttendanceService
     /**
      * Tính số công chính thức của nhân viên
      */
-    protected function calculateOfficialDays($employeeId)
+    protected function calculateOfficialDays($employeeId, $date = null)
     {
-        return Attendance::where('employee_id', $employeeId)
+        $date = $date ? Carbon::parse($date) : now();
+
+        return AttendanceEmployee::where('employee_id', $employeeId)
             ->where('work_hours', '>', 0)
+            ->whereMonth('check_in', $date->month)
+            ->whereYear('check_in', $date->year)
             ->count();
     }
+
 
     /**
      * Dùng chung cho thêm mới hoặc cập nhật attendance
@@ -99,8 +109,11 @@ class AttendanceService
         $data['work_hours'] = $this->calculateWorkHours($data['check_in'] ?? null, $data['check_out'] ?? null);
 
         if (!empty($data['employee_id'])) {
-            // lấy số công hiện tại trong DB
-            $officialDays = $this->calculateOfficialDays($data['employee_id']);
+            // lấy số công trong tháng của ngày check_in
+            $officialDays = $this->calculateOfficialDays(
+                $data['employee_id'],
+                $data['check_in'] ?? now()
+            );
 
             // nếu là tạo mới & có work_hours > 0 thì +1 công
             if (is_null($id) && $data['work_hours'] > 0) {
@@ -110,12 +123,13 @@ class AttendanceService
             $data['official_days'] = $officialDays;
         }
 
+
         if ($id) {
-            $attendance = Attendance::findOrFail($id);
+            $attendance = AttendanceEmployee::findOrFail($id);
             $attendance->update($data);
             return $attendance;
         }
 
-        return Attendance::create($data);
+        return AttendanceEmployee::create($data);
     }
 }

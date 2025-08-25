@@ -518,5 +518,16 @@ Route::group(['namespace' => 'Admin'], function () {
     Route::put('/payroll/{id}', [PayrollController::class, 'update'])->name('payroll.update');
     Route::delete('/payroll/destroy/{id}', [PayrollController::class, 'destroy'])->name('payroll.destroy');
     Route::post('/payroll/import', [PayrollController::class, 'import'])->name('payroll.import');
+    Route::get('payroll/monthly', [PayrollController::class, 'monthly'])->name('payroll.monthly');
+
+
+//     Route::get('lang/{locale}', function ($locale) {
+//     if (in_array($locale, ['en', 'vi'])) {
+//         session(['locale' => $locale]);
+//     }
+//     return redirect()->back();
+//     });
+
+
 });
 

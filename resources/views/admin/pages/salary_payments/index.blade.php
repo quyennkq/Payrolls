@@ -113,79 +113,77 @@
                         @lang('not_found')
                     </div>
                 @else --}}
-                    <form id="salary_payment-form" method="POST">
-                        @csrf
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">@lang('STT')</th>
-                                        <th class="text-center">@lang('Mã nhân viên')</th>
-                                        <th class="text-center">@lang('Tên nhân viên')</th>
-                                        <th class="text-center">@lang('Lương cơ bản')</th>
-                                        <th class="text-center">@lang('Lương nặng lực nhân viên có điều kiện')</th>
-                                        <th class="text-center">@lang('Lương HQCV có điều kiện')</th>
-                                        <th class="text-center">@lang('Thu nhập theo vị trí')</th>
-                                        <th class="text-center">@lang('Lương đóng BHXH')</th>
-                                        <th class="text-center">@lang('Thao tác')</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($rows as $row)
-                                        <tr>
-                                            <td>{{ $loop->index + 1 }}</td>
-                                            <td>
-                                                {{ $row->employee_id ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->user->first_name ?? '' }} {{ $row->user->last_name ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->base_salary ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->competency_salary ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->performance_salary ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->position_income ?? '' }}
-                                            </td>
-                                            <td>
-                                                {{ $row->social_insurance_salary ?? '' }}
-                                            </td>
 
-                                            <td>
-                                                {{-- <a class="btn btn-sm btn-primary"
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">@lang('STT')</th>
+                                <th class="text-center">@lang('Mã nhân viên')</th>
+                                <th class="text-center">@lang('Tên nhân viên')</th>
+                                <th class="text-center">@lang('Lương cơ bản')</th>
+                                <th class="text-center">@lang('Lương nặng lực nhân viên có điều kiện')</th>
+                                <th class="text-center">@lang('Lương HQCV có điều kiện')</th>
+                                <th class="text-center">@lang('Thu nhập theo vị trí')</th>
+                                <th class="text-center">@lang('Lương đóng BHXH')</th>
+                                <th class="text-center">@lang('Thao tác')</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($rows as $row)
+                                <tr>
+                                    <td>{{ $loop->index + 1 }}</td>
+                                    <td>
+                                        {{ $row->employee_id ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->admin->name ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->base_salary ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->competency_salary ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->performance_salary ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->position_income ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->social_insurance_salary ?? '' }}
+                                    </td>
+
+                                    <td>
+                                        {{-- <a class="btn btn-sm btn-primary"
                                                     href="{{ route('salary_payment.show', $row->id) }}" data-toggle="tooltip"
                                                     title="@lang('Chi tiết')" data-original-title="@lang('Chi tiết')"
                                                     onclick="return openCenteredPopup(this.href)">
                                                     <i class="fa fa-eye"></i>
                                                 </a> --}}
-                                                <a class="btn btn-sm btn-warning" data-toggle="tooltip"
-                                                    title="@lang('Update')" data-original-title="@lang('Update')"
-                                                    href="{{ route('salary_payment.edit', $row->id) }}">
-                                                    <i class="fa fa-pencil-square-o"></i>
-                                                </a>
-                                                <form action="{{ route('salary_payment.delete', $row->id) }}" method="POST"
-                                                    style="display: inline-block;"
-                                                    onsubmit="return confirm('@lang('Bạn có chắc chắn muốn xóa?')');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-sm btn-danger" type="submit"
-                                                        data-toggle="tooltip" title="@lang('Delete')"
-                                                        data-original-title="@lang('Delete')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+                                        <a class="btn btn-sm btn-warning" data-toggle="tooltip" title="@lang('Update')"
+                                            data-original-title="@lang('Update')"
+                                            href="{{ route('salary_payment.edit', $row->id) }}">
+                                            <i class="fa fa-pencil-square-o"></i>
+                                        </a>
+                                        <form action="{{ route('salary_payment.delete', $row->id) }}" method="POST"
+                                            style="display: inline-block;"
+                                            onsubmit="return confirm('@lang('Bạn có chắc chắn muốn xóa?')');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger" type="submit" data-toggle="tooltip"
+                                                title="@lang('Delete')" data-original-title="@lang('Delete')">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
                 {{-- @endif --}}
             </div>
             <div class="box-footer clearfix">

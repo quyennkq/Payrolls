@@ -36,7 +36,7 @@
                                                 <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <option value="<?php echo e($user->id); ?>"
                                                         <?php echo e(old('employee_id', $leave_request->employee_id ?? '') == $user->id ? 'selected' : ''); ?>>
-                                                        <?php echo e($user->username); ?>
+                                                        <?php echo e($user->name); ?>
 
                                                     </option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -47,9 +47,19 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label><?php echo app('translator')->get('Ngày nghỉ'); ?> <small class="text-red">*</small></label>
-                                            <input type="date" class="form-control" name="leave_date"
-                                                value="<?php echo e(old('leave_date', $leave_request->leave_date ?? '')); ?>"
+                                            <label><?php echo app('translator')->get('Ngày bắt đầu'); ?> <small class="text-red">*</small></label>
+                                            <input type="date" class="form-control" name="leave_date_start"
+                                                value="<?php echo e(old('leave_date_start', $leave_request->leave_date_start ?? '')); ?>"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label><?php echo app('translator')->get('Ngày kết thúc'); ?> <small class="text-red">*</small></label>
+                                            <input type="date" class="form-control" name="leave_date_end"
+                                                value="<?php echo e(old('leave_date_end', $leave_request->leave_date_end ?? '')); ?>"
                                                 required>
                                         </div>
                                     </div>
@@ -111,4 +121,6 @@
             </div>
         </div>
 </form>
+
+
 <?php /**PATH C:\laragon\www\steam\steamwonder\resources\views/admin/pages/leave_request/form.blade.php ENDPATH**/ ?>

@@ -147,7 +147,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                                <form action="<?php echo e(route('payroll.delete', $payroll->id)); ?>" method="POST">
+                                <form action="<?php echo e(route('payroll.destroy', $payroll->id)); ?>" method="POST">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>
                                     <button type="submit" class="btn btn-danger">Xác nhận xóa</button>

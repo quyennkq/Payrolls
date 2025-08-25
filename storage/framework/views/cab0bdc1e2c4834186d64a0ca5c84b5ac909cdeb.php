@@ -52,7 +52,7 @@ unset($__errorArgs, $__bag); ?>
                                             <label><?php echo app('translator')->get('Tháng'); ?> <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="month"
                                                 value="<?php echo e(old('month', $payroll->month ?? '')); ?>"
-                                                placeholder="<?php echo app('translator')->get('YYYY-MM'); ?>" pattern="\d{4}-\d{2}" required>
+                                                placeholder="<?php echo app('translator')->get('YYYY-MM-DD'); ?>" pattern="\d{4}-\d{2}-\d{2}" required>
                                             <?php $__errorArgs = ['month'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

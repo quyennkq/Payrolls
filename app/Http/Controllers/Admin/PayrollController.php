@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Services\PayrollService;
 use App\Models\Payroll;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PayrollController extends Controller
@@ -27,17 +28,25 @@ class PayrollController extends Controller
             $query->where('employee_id', $request->employee_id);
         }
 
-        //lọc theo khoảng ngày
-        if ($request->filled('date')) {
-            $query->whereDate('leave_date', '=', $request->form_date);
+        if ($request->filled('month')) {
+            $month = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $query->whereMonth('month', $month->month)
+                ->whereYear('month', $month->year);
         }
+          if ($request->filled('form_date')) {
+            $query->whereDate('created_at', '>=', $request->form_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         //sắp xếp
-        // $sort = $request->get('sort', 'asc');
-        // $query->orderBy('leave_date', $sort);
+        $sort = $request->get('sort', 'asc');
+        $query->orderBy('month', $sort);
         $rows = $query->paginate(10);
         $this->responseData['rows'] = $rows;
         return $this->responseView($this->viewPart . '.index');
@@ -66,7 +75,7 @@ class PayrollController extends Controller
             'saturday_meal_support' => 'required|numeric',
         ]);
         $this->payrollService->createOrUpdatePayroll($request->all());
-        return redirect()->route('payroll.index')->with('successMessage','Bạn đã thêm mới thành công');
+        return redirect()->route('payroll.index')->with('successMessage', 'Bạn đã thêm mới thành công');
     }
     public function edit($id)
     {
@@ -85,7 +94,7 @@ class PayrollController extends Controller
         $this->payrollService->createOrUpdatePayroll($request->all(), $id);
         return redirect()->route('payroll.index')->with('successMessage', 'Bạn đã sửa thành công');
     }
-    public function show(Payroll $payroll,$id)
+    public function show(Payroll $payroll, $id)
     {
         $payroll = Payroll::findOrFail($id);
         $this->responseData['payroll'] = $payroll;
@@ -93,9 +102,8 @@ class PayrollController extends Controller
     }
     public function destroy($id)
     {
-        dd($id);
         $payroll = Payroll::findOrFail($id);
         $payroll->delete();
-        return redirect()->route('payroll.index')->with('successMessage','Bạn đã xóa thành công');
+        return redirect()->route('payroll.index')->with('successMessage', 'Bạn đã xóa thành công');
     }
 }

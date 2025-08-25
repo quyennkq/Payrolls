@@ -38,26 +38,25 @@
                             <input type="text" class="form-control" name="employee_id" placeholder="@lang('Nhập mã nhân viên')"
                                 value="{{ isset($params['employee_id']) ? $params['employee_id'] : '' }}">
                         </div>
+
+                        {{-- ✅ Thêm chọn tháng --}}
                         <div class="form-group">
-                            <label class="form-label">@lang('Ngày nghỉ')</label>
+                            <label class="form-label">@lang('Chọn tháng')</label>
+                            <input type="month" class="form-control" name="month"
+                                value="{{ isset($params['month']) ? $params['month'] : date('Y-m') }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">@lang('Từ')</label>
                             <input type="date" class="form-control" name="form_date"
-                                value="{{ isset($params['date']) ? $params['date'] : '' }}">
+                                value="{{ isset($params['form_date']) ? $params['form_date'] : '' }}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">@lang('Trạng thái')</label>
-                            <select class="form-control" id="status" name="status">
-                                <option value="pending"
-                                    {{ old('status', $leave_request->status ?? '') == 'pending' ? 'selected' : '' }}>
-                                    Chờ duyệt</option>
-                                <option value="approved"
-                                    {{ old('status', $leave_request->status ?? '') == 'approved' ? 'selected' : '' }}>
-                                    Đã duyệt</option>
-                                <option value="rejected"
-                                    {{ old('status', $leave_request->status ?? '') == 'rejected' ? 'selected' : '' }}>
-                                    Từ chối</option>
-                            </select>
+                            <label class="form-label">@lang('Đến')</label>
+                            <input type="date" class="form-control" name="to_date"
+                                value="{{ isset($params['to_date']) ? $params['to_date'] : '' }}">
                         </div>
-                        {{-- <div class="form-group">
+                        <div class="form-group">
                             <label class="form-label">@lang('Thứ tự')</label>
                             <select class="form-control" name="sort">
                                 <option value="asc"
@@ -67,13 +66,12 @@
                                     {{ isset($params['sort']) && $params['sort'] == 'desc' ? 'selected' : '' }}>
                                     @lang('Giảm dần')</option>
                             </select>
-                        </div> --}}
+                        </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary action-btn">@lang('Lọc')</button>
                             <a class="btn btn-default action-btn"
                                 href="{{ route(Request::segment(2) . '.index') }}">@lang('Reset')</a>
                         </div>
-
                     </div>
                 </div>
             </form>
@@ -122,95 +120,83 @@
                         @lang('not_found')
                     </div>
                 @else --}}
-                <form id="salary_payment-form" method="POST">
-                    @csrf
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered">
-                            <thead>
+
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">@lang('STT')</th>
+                                <th class="text-center">@lang('ID')</th>
+                                <th class="text-center">@lang('Mã nhân viên')</th>
+                                <th class="text-center">@lang('Tên nhân viên')</th>
+                                <th class="text-center">@lang('Tháng')</th>
+                                <th class="text-center">@lang('lương cơ bản theo ngày')</th>
+                                <th class="text-center">@lang('Tổng thu nhập')</th>
+                                <th class="text-center">@lang('Tổng khấu trừ')</th>
+                                <th class="text-center">@lang('Tạm ứng')</th>
+                                <th class="text-center">@lang('Thực lĩnh')</th>
+                                <th class="text-center">@lang('Thao tác')</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($rows as $row)
                                 <tr>
-                                    <th class="text-center">@lang('STT')</th>
-                                    <th class="text-center">@lang('ID')</th>
-                                    <th class="text-center">@lang('Mã nhân viên')</th>
-                                    <th class="text-center">@lang('Tên nhân viên')</th>
-                                    <th class="text-center">@lang('Tháng')</th>
-                                    <th class="text-center">@lang('lương cơ bản theo ngày')</th>
-                                    <th class="text-center">@lang('Tổng thu nhập')</th>
-                                    <th class="text-center">@lang('Tổng khấu trừ')</th>
-                                    <th class="text-center">@lang('Tạm ứng')</th>
-                                    <th class="text-center">@lang('Thực lĩnh')</th>
-                                    <th class="text-center">@lang('Thao tác')</th>
+                                    <td>{{ $loop->index + 1 }}</td>
+                                    <td>{{ $row->id ?? '' }}</td>
+                                    <td>
+                                        {{ $row->employee_id ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->admin->name ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->month ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->base_salary_by_days ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->total_income ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->total_deductions ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->advance_payment ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ $row->net_income ?? '' }}
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-primary" href="{{ route('payroll.show', $row->id) }}"
+                                            data-toggle="tooltip" title="@lang('Chi tiết')"
+                                            data-original-title="@lang('Chi tiết')">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+
+                                        <a class="btn btn-sm btn-warning" data-toggle="tooltip"
+                                            title="@lang('Update')" data-original-title="@lang('Update')"
+                                            href="{{ route('payroll.edit', $row->id) }}">
+                                            <i class="fa fa-pencil-square-o"></i>
+                                        </a>
+
+                                        <form action="{{ route('payroll.destroy', $row->id) }}" method="POST"
+                                            style="display:inline-block;"
+                                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger" type="submit">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($rows as $row)
-                                    <tr>
-                                        <td>{{ $loop->index + 1 }}</td>
-                                        <td>{{ $row->id ?? '' }}</td>
-                                        <td>
-                                            {{ $row->employee_id ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->user->first_name ?? '' }} {{ $row->user->last_name ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->month ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->base_salary_by_days ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->total_income ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->total_deductions ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->advance_payment ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $row->net_income ?? '' }}
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-sm btn-primary" href="{{ route('payroll.show', $row->id) }}"
-                                                data-toggle="tooltip" title="@lang('Chi tiết')"
-                                                data-original-title="@lang('Chi tiết')">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                                            <a class="btn btn-sm btn-warning" data-toggle="tooltip"
-                                                title="@lang('Update')" data-original-title="@lang('Update')"
-                                                href="{{ route('payroll.edit', $row->id) }}">
-                                                <i class="fa fa-pencil-square-o"></i>
-                                            </a>
-                                            {{-- <form action="{{ route('payroll.delete', $row->id) }}" method="POST"
-                                                style="display: inline-block;"
-                                                onsubmit="return confirm('@lang('Bạn có chắc chắn muốn xóa?')');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-sm btn-danger" type="submit"
-                                                    data-toggle="tooltip" title="@lang('Delete')"
-                                                    data-original-title="@lang('Delete')">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form> --}}
-                                            <form action="{{ route('payroll.destroy', $row->id) }}" method="POST"
-                                                style="display:inline-block;"
-                                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-sm btn-danger" type="submit">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
-
-
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
             </div>
             <div class="box-footer clearfix">
                 <div class="row">

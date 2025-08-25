@@ -37,6 +37,13 @@
                                 value="<?php echo e(isset($params['employee_id']) ? $params['employee_id'] : ''); ?>">
                         </div>
 
+                        
+                        <div class="form-group">
+                            <label class="form-label"><?php echo app('translator')->get('Chọn tháng'); ?></label>
+                            <input type="month" class="form-control" name="month"
+                                value="<?php echo e(isset($params['month']) ? $params['month'] : date('Y-m')); ?>">
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label"><?php echo app('translator')->get('Từ'); ?></label>
                             <input type="date" class="form-control" name="form_date"
@@ -63,14 +70,15 @@
                             <a class="btn btn-default action-btn"
                                 href="<?php echo e(route(Request::segment(2) . '.index')); ?>"><?php echo app('translator')->get('Reset'); ?></a>
                         </div>
-
                     </div>
                 </div>
             </form>
+
             <div class="d-flex align-items-center gap-2" style="margin: 21px">
                 <form action="<?php echo e(route('attendance.import')); ?>" method="POST" enctype="multipart/form-data"
                     class="d-flex align-items-center gap-2" style="margin-bottom: 21px">
                     <?php echo csrf_field(); ?>
+
                     <input type="file" name="excel_file" class="form-control form-control-sm" style="height: 38px;"
                         required>
                     <button type="submit" class="btn btn-warning btn-sm" style="margin-left: 10px;">
@@ -114,90 +122,87 @@
                         <?php echo app('translator')->get('not_found'); ?>
                     </div>
                 <?php else: ?>
-                    <form id="attendance-form" method="POST">
-                        <?php echo csrf_field(); ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered">
-                                <thead>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><?php echo app('translator')->get('STT'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Mã nhân viên'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Tên nhân viên'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Thời gian vào'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Thời gian ra'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Số giờ làm việc'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Ngày công chuẩn'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Công thử việc'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Công chính thức'); ?></th>
+                                    <th class="text-center"><?php echo app('translator')->get('Thao tác'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <th class="text-center"><?php echo app('translator')->get('STT'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Mã nhân viên'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Tên nhân viên'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Thời gian vào'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Thời gian ra'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Số giờ làm việc'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Ngày công chuẩn'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Công thử việc'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Công chính thức'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Thao tác'); ?></th>
+                                        <td><?php echo e($loop->index + 1); ?></td>
+                                        <td>
+                                            <?php echo e($row->employee_id ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->admin->name ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->check_in ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->check_out ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->work_hours ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->standard_working_days ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->probation_days ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo e($row->official_days ?? ''); ?>
+
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-primary"
+                                                href="<?php echo e(route('attendance.show', $row->id)); ?>" data-toggle="tooltip"
+                                                title="<?php echo app('translator')->get('Chi tiết'); ?>" data-original-title="<?php echo app('translator')->get('Chi tiết'); ?>"
+                                                onclick="return openCenteredPopup(this.href)">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-warning" data-toggle="tooltip"
+                                                title="<?php echo app('translator')->get('Update'); ?>" data-original-title="<?php echo app('translator')->get('Update'); ?>"
+                                                href="<?php echo e(route('attendance.edit', $row->id)); ?>">
+                                                <i class="fa fa-pencil-square-o"></i>
+                                            </a>
+                                            <form action="<?php echo e(route('attendance.delete', $row->id)); ?>" method="POST"
+                                                style="display: inline-block;"
+                                                onsubmit="return confirm('<?php echo app('translator')->get('Bạn có chắc chắn muốn xóa?'); ?>');">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
+                                                <button class="btn btn-sm btn-danger" type="submit"
+                                                    data-toggle="tooltip" title="<?php echo app('translator')->get('Delete'); ?>"
+                                                    data-original-title="<?php echo app('translator')->get('Delete'); ?>">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <tr>
-                                            <td><?php echo e($loop->index + 1); ?></td>
-                                            <td>
-                                                <?php echo e($row->employee_id ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->user->first_name ?? ''); ?> <?php echo e($row->user->last_name ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->check_in ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->check_out ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->work_hours ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->standard_working_days ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->probation_days ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->official_days ?? ''); ?>
-
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-sm btn-primary"
-                                                    href="<?php echo e(route('attendance.show', $row->id)); ?>" data-toggle="tooltip"
-                                                    title="<?php echo app('translator')->get('Chi tiết'); ?>" data-original-title="<?php echo app('translator')->get('Chi tiết'); ?>"
-                                                    onclick="return openCenteredPopup(this.href)">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                                <a class="btn btn-sm btn-warning" data-toggle="tooltip"
-                                                    title="<?php echo app('translator')->get('Update'); ?>" data-original-title="<?php echo app('translator')->get('Update'); ?>"
-                                                    href="<?php echo e(route('attendance.edit', $row->id)); ?>">
-                                                    <i class="fa fa-pencil-square-o"></i>
-                                                </a>
-                                                <form action="<?php echo e(route('attendance.delete', $row->id)); ?>" method="POST"
-                                                    style="display: inline-block;"
-                                                    onsubmit="return confirm('<?php echo app('translator')->get('Bạn có chắc chắn muốn xóa?'); ?>');">
-                                                    <?php echo csrf_field(); ?>
-                                                    <?php echo method_field('DELETE'); ?>
-                                                    <button class="btn btn-sm btn-danger" type="submit"
-                                                        data-toggle="tooltip" title="<?php echo app('translator')->get('Delete'); ?>"
-                                                        data-original-title="<?php echo app('translator')->get('Delete'); ?>">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
             <div class="box-footer clearfix">

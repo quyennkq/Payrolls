@@ -33,15 +33,15 @@ class User extends Authenticatable
         'member_id',
     ];
 
-    public function salaryPayments() {
-        return $this->hasMany(SalaryPayment::class, 'employee_id');
-    }
-    public function attendances() {
-        return $this->hasMany(Attendance::class, 'employee_id');
-    }
-    public function leaveRequests() {
-        return $this->hasMany(LeaveRequestSalary::class, 'employee_id');
-    }
+    // public function salaryPayments() {
+    //     return $this->hasMany(SalaryPayment::class, 'employee_id');
+    // }
+    // public function attendances() {
+    //     return $this->hasMany(Attendance::class, 'employee_id');
+    // }
+    // public function leaveRequests() {
+    //     return $this->hasMany(LeaveRequestSalary::class, 'employee_id');
+    // }
     /**
      * The attributes that aren't mass assignable.
      *

@@ -36,32 +36,40 @@
                             <input type="text" class="form-control" name="employee_id" placeholder="<?php echo app('translator')->get('Nhập mã nhân viên'); ?>"
                                 value="<?php echo e(isset($params['employee_id']) ? $params['employee_id'] : ''); ?>">
                         </div>
+
+                        
                         <div class="form-group">
-                            <label class="form-label"><?php echo app('translator')->get('Ngày nghỉ'); ?></label>
+                            <label class="form-label"><?php echo app('translator')->get('Chọn tháng'); ?></label>
+                            <input type="month" class="form-control" name="month"
+                                value="<?php echo e(isset($params['month']) ? $params['month'] : date('Y-m')); ?>">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label"><?php echo app('translator')->get('Từ'); ?></label>
                             <input type="date" class="form-control" name="form_date"
-                                value="<?php echo e(isset($params['date']) ? $params['date'] : ''); ?>">
+                                value="<?php echo e(isset($params['form_date']) ? $params['form_date'] : ''); ?>">
                         </div>
                         <div class="form-group">
-                            <label class="form-label"><?php echo app('translator')->get('Trạng thái'); ?></label>
-                            <select class="form-control" id="status" name="status">
-                                <option value="pending"
-                                    <?php echo e(old('status', $leave_request->status ?? '') == 'pending' ? 'selected' : ''); ?>>
-                                    Chờ duyệt</option>
-                                <option value="approved"
-                                    <?php echo e(old('status', $leave_request->status ?? '') == 'approved' ? 'selected' : ''); ?>>
-                                    Đã duyệt</option>
-                                <option value="rejected"
-                                    <?php echo e(old('status', $leave_request->status ?? '') == 'rejected' ? 'selected' : ''); ?>>
-                                    Từ chối</option>
+                            <label class="form-label"><?php echo app('translator')->get('Đến'); ?></label>
+                            <input type="date" class="form-control" name="to_date"
+                                value="<?php echo e(isset($params['to_date']) ? $params['to_date'] : ''); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><?php echo app('translator')->get('Thứ tự'); ?></label>
+                            <select class="form-control" name="sort">
+                                <option value="asc"
+                                    <?php echo e(isset($params['sort']) && $params['sort'] == 'asc' ? 'selected' : ''); ?>>
+                                    <?php echo app('translator')->get('Tăng dần'); ?></option>
+                                <option value="desc"
+                                    <?php echo e(isset($params['sort']) && $params['sort'] == 'desc' ? 'selected' : ''); ?>>
+                                    <?php echo app('translator')->get('Giảm dần'); ?></option>
                             </select>
                         </div>
-                        
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary action-btn"><?php echo app('translator')->get('Lọc'); ?></button>
                             <a class="btn btn-default action-btn"
                                 href="<?php echo e(route(Request::segment(2) . '.index')); ?>"><?php echo app('translator')->get('Reset'); ?></a>
                         </div>
-
                     </div>
                 </div>
             </form>
@@ -97,101 +105,99 @@
                     </div>
                 <?php endif; ?>
                 
-                <form id="salary_payment-form" method="POST">
-                    <?php echo csrf_field(); ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered">
-                            <thead>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><?php echo app('translator')->get('STT'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Mã nhân viên'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Tên nhân viên'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Mã đơn nghỉ phép'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Ngày xin nghỉ'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Loại nghỉ(có hoặc không lương)'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Lý do nghỉ'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Trạng thái'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Thao tác'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <th class="text-center"><?php echo app('translator')->get('STT'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Mã nhân viên'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Tên nhân viên'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Mã đơn nghỉ phép'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Ngày xin nghỉ'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Loại nghỉ(có hoặc không lương)'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Lý do nghỉ'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Trạng thái'); ?></th>
-                                    <th class="text-center"><?php echo app('translator')->get('Thao tác'); ?></th>
+                                    <td><?php echo e($loop->index + 1); ?></td>
+                                    <td>
+                                        <?php echo e($row->employee_id ?? ''); ?>
+
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->admin->name ?? ''); ?>
+
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->id ?? ''); ?>
+
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->leave_date_start ?? ''); ?> đến ngày <?php echo e($row->leave_date_end ?? ''); ?>
+
+                                    </td>
+
+                                    <td>
+                                        <span>
+                                            <?php
+                                                $types = [
+                                                    'paid' => 'Nghỉ phép (có lương)',
+                                                    'unpaid' => 'Nghỉ không phép',
+                                                ];
+                                            ?>
+                                            <?php echo e($types[$row->leave_type] ?? 'Không xác định'); ?>
+
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->reason ?? 'Không có lý do'); ?>
+
+                                    </td>
+                                    <td>
+                                        <span>
+                                            <?php
+                                                $types = [
+                                                    'pending' => 'Đang chờ',
+                                                    'approved' => 'Đã duyệt',
+                                                    'rejected' => 'Đã từ chối',
+                                                ];
+                                            ?>
+                                            <?php echo e($types[$row->status] ?? 'Không xác định'); ?></span>
+                                    </td>
+
+                                    <td>
+                                        <a class="btn btn-sm btn-primary"
+                                            href="<?php echo e(route('leave_request.show', $row->id)); ?>" data-toggle="tooltip"
+                                            title="<?php echo app('translator')->get('Chi tiết'); ?>" data-original-title="<?php echo app('translator')->get('Chi tiết'); ?>"
+                                            onclick="return openCenteredPopup(this.href)">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-warning" data-toggle="tooltip" title="<?php echo app('translator')->get('Update'); ?>"
+                                            data-original-title="<?php echo app('translator')->get('Update'); ?>"
+                                            href="<?php echo e(route('leave_request.edit', $row->id)); ?>">
+                                            <i class="fa fa-pencil-square-o"></i>
+                                        </a>
+                                        <form action="<?php echo e(route('leave_request.delete', $row->id)); ?>" method="POST"
+                                            style="display: inline-block;" onsubmit="return confirm('<?php echo app('translator')->get('Bạn có chắc chắn muốn xóa?'); ?>');">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
+                                            <button class="btn btn-sm btn-danger" type="submit" data-toggle="tooltip"
+                                                title="<?php echo app('translator')->get('Delete'); ?>" data-original-title="<?php echo app('translator')->get('Delete'); ?>">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <tr>
-                                        <td><?php echo e($loop->index + 1); ?></td>
-                                        <td>
-                                            <?php echo e($row->employee_id ?? ''); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
 
-                                        </td>
-                                        <td>
-                                            <?php echo e($row->user->first_name ?? ''); ?> <?php echo e($row->user->last_name ?? ''); ?>
-
-                                        </td>
-                                        <td>
-                                            <?php echo e($row->id ?? ''); ?>
-
-                                        </td>
-                                        <td>
-                                            <?php echo e($row->leave_date ?? ''); ?>
-
-                                        </td>
-                                        <td>
-                                            <span>
-                                                <?php
-                                                    $types = [
-                                                        'paid' => 'Nghỉ phép (có lương)',
-                                                        'unpaid' => 'Nghỉ không phép',
-                                                    ];
-                                                ?>
-                                                <?php echo e($types[$row->leave_type] ?? 'Không xác định'); ?>
-
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php echo e($row->reason ?? 'Không có lý do'); ?>
-
-                                        </td>
-                                        <td>
-                                            <span>
-                                                <?php
-                                                    $types = [
-                                                        'pending' => 'Đang chờ',
-                                                        'approved' => 'Đã duyệt',
-                                                        'rejected' => 'Đã từ chối',
-                                                    ];
-                                                ?>
-                                                <?php echo e($types[$row->status] ?? 'Không xác định'); ?></span>
-                                        </td>
-
-                                        <td>
-                                            <a class="btn btn-sm btn-primary"
-                                                href="<?php echo e(route('leave_request.show', $row->id)); ?>" data-toggle="tooltip"
-                                                title="<?php echo app('translator')->get('Chi tiết'); ?>" data-original-title="<?php echo app('translator')->get('Chi tiết'); ?>"
-                                                onclick="return openCenteredPopup(this.href)">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn-warning" data-toggle="tooltip"
-                                                title="<?php echo app('translator')->get('Update'); ?>" data-original-title="<?php echo app('translator')->get('Update'); ?>"
-                                                href="<?php echo e(route('leave_request.edit', $row->id)); ?>">
-                                                <i class="fa fa-pencil-square-o"></i>
-                                            </a>
-                                            <form action="<?php echo e(route('leave_request.delete', $row->id)); ?>" method="POST"
-                                                style="display: inline-block;"
-                                                onsubmit="return confirm('<?php echo app('translator')->get('Bạn có chắc chắn muốn xóa?'); ?>');">
-                                                <?php echo csrf_field(); ?>
-                                                <?php echo method_field('DELETE'); ?>
-                                                <button class="btn btn-sm btn-danger" type="submit"
-                                                    data-toggle="tooltip" title="<?php echo app('translator')->get('Delete'); ?>"
-                                                    data-original-title="<?php echo app('translator')->get('Delete'); ?>">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
             </div>
             <div class="box-footer clearfix">
                 <div class="row">

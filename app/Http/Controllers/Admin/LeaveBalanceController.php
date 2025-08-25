@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Services\LeaveBalanceSalaryService;
+use App\Models\Admin;
 use App\Models\LeaveBalance;
 use App\Models\LeaveBalanceSalary;
 use Illuminate\Http\Request;
 use App\Models\LeaveRequestSalary;
 use App\Models\User;
+use Carbon\Carbon;
 
 class LeaveBalanceController extends Controller
 {
@@ -30,10 +32,18 @@ class LeaveBalanceController extends Controller
             $query->where('employee_id', $request->employee_id);
         }
 
-        //lọc theo khoảng ngày
-        if ($request->filled('date')) {
-            $query->whereDate('leave_date', '=', $request->form_date);
+        if ($request->filled('month')) {
+            $month = Carbon::parse($request->month);
+            $query->whereMonth('updated_at', $month->month)
+                ->whereYear('updated_at', $month->year);
         }
+          if ($request->filled('form_date')) {
+            $query->whereDate('created_at', '>=', $request->form_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -48,7 +58,7 @@ class LeaveBalanceController extends Controller
 
     public function create()
     {
-        $users = User::all();
+        $users = Admin::all();
         $this->responseData['users'] = $users;
         return $this->responseView($this->viewPart . '.create', $this->responseData);
     }
@@ -64,11 +74,11 @@ class LeaveBalanceController extends Controller
             'remaining_leave' => 'required|integer',
         ]);
         $this->leaveBalanceSalaryService->createOrUpdateLeaveBalanceSalary($request->all());
-        return redirect()->route('leave_balance.index')->with('successMessage','Thêm mới thành công');
+        return redirect()->route('leave_balance.index')->with('successMessage', 'Thêm mới thành công');
     }
     public function edit($id)
     {
-        $users = User::all();
+        $users = Admin::all();
         $leave_balance = LeaveBalanceSalary::findOrFail($id);
         $this->responseData['users'] = $users;
         $this->responseData['leave_balance'] = $leave_balance;
@@ -85,12 +95,12 @@ class LeaveBalanceController extends Controller
             'remaining_leave' => 'required|integer',
         ]);
         $this->leaveBalanceSalaryService->createOrUpdateLeaveBalanceSalary($request->all(), $id);
-        return redirect()->route('leave_balance.index')->with('successMessage','Sửa thành công');
+        return redirect()->route('leave_balance.index')->with('successMessage', 'Sửa thành công');
     }
     public function destroy($id)
     {
         $leave_balance = LeaveBalanceSalary::findOrFail($id);
         $leave_balance->delete();
-        return redirect('leave_balance.index')->with('successMessage','Xóa thành công');
+        return redirect('leave_balance.index')->with('successMessage', 'Xóa thành công');
     }
 }

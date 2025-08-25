@@ -108,81 +108,79 @@
                     </div>
                 <?php endif; ?>
                 
-                    <form id="salary_payment-form" method="POST">
-                        <?php echo csrf_field(); ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center"><?php echo app('translator')->get('STT'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Mã nhân viên'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Tên nhân viên'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Lương cơ bản'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Lương nặng lực nhân viên có điều kiện'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Lương HQCV có điều kiện'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Thu nhập theo vị trí'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Lương đóng BHXH'); ?></th>
-                                        <th class="text-center"><?php echo app('translator')->get('Thao tác'); ?></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <tr>
-                                            <td><?php echo e($loop->index + 1); ?></td>
-                                            <td>
-                                                <?php echo e($row->employee_id ?? ''); ?>
 
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->user->first_name ?? ''); ?> <?php echo e($row->user->last_name ?? ''); ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><?php echo app('translator')->get('STT'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Mã nhân viên'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Tên nhân viên'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Lương cơ bản'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Lương nặng lực nhân viên có điều kiện'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Lương HQCV có điều kiện'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Thu nhập theo vị trí'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Lương đóng BHXH'); ?></th>
+                                <th class="text-center"><?php echo app('translator')->get('Thao tác'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td><?php echo e($loop->index + 1); ?></td>
+                                    <td>
+                                        <?php echo e($row->employee_id ?? ''); ?>
 
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->base_salary ?? ''); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->admin->name ?? ''); ?>
 
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->competency_salary ?? ''); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->base_salary ?? ''); ?>
 
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->performance_salary ?? ''); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->competency_salary ?? ''); ?>
 
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->position_income ?? ''); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->performance_salary ?? ''); ?>
 
-                                            </td>
-                                            <td>
-                                                <?php echo e($row->social_insurance_salary ?? ''); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->position_income ?? ''); ?>
 
-                                            </td>
+                                    </td>
+                                    <td>
+                                        <?php echo e($row->social_insurance_salary ?? ''); ?>
 
-                                            <td>
-                                                
-                                                <a class="btn btn-sm btn-warning" data-toggle="tooltip"
-                                                    title="<?php echo app('translator')->get('Update'); ?>" data-original-title="<?php echo app('translator')->get('Update'); ?>"
-                                                    href="<?php echo e(route('salary_payment.edit', $row->id)); ?>">
-                                                    <i class="fa fa-pencil-square-o"></i>
-                                                </a>
-                                                <form action="<?php echo e(route('salary_payment.delete', $row->id)); ?>" method="POST"
-                                                    style="display: inline-block;"
-                                                    onsubmit="return confirm('<?php echo app('translator')->get('Bạn có chắc chắn muốn xóa?'); ?>');">
-                                                    <?php echo csrf_field(); ?>
-                                                    <?php echo method_field('DELETE'); ?>
-                                                    <button class="btn btn-sm btn-danger" type="submit"
-                                                        data-toggle="tooltip" title="<?php echo app('translator')->get('Delete'); ?>"
-                                                        data-original-title="<?php echo app('translator')->get('Delete'); ?>">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+                                    </td>
+
+                                    <td>
+                                        
+                                        <a class="btn btn-sm btn-warning" data-toggle="tooltip" title="<?php echo app('translator')->get('Update'); ?>"
+                                            data-original-title="<?php echo app('translator')->get('Update'); ?>"
+                                            href="<?php echo e(route('salary_payment.edit', $row->id)); ?>">
+                                            <i class="fa fa-pencil-square-o"></i>
+                                        </a>
+                                        <form action="<?php echo e(route('salary_payment.delete', $row->id)); ?>" method="POST"
+                                            style="display: inline-block;"
+                                            onsubmit="return confirm('<?php echo app('translator')->get('Bạn có chắc chắn muốn xóa?'); ?>');">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
+                                            <button class="btn btn-sm btn-danger" type="submit" data-toggle="tooltip"
+                                                title="<?php echo app('translator')->get('Delete'); ?>" data-original-title="<?php echo app('translator')->get('Delete'); ?>">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
+
                 
             </div>
             <div class="box-footer clearfix">
