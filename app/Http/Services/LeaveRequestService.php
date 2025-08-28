@@ -67,18 +67,22 @@ class LeaveRequestService
 
         $diff = $newDays - $oldDays;
 
+        // Tổng số ngày phép thực tế (used + remaining)
+        $totalLeave = $leaveBalance->used_leave + $leaveBalance->remaining_leave;
+
         if ($diff > 0) {
-            // Tăng số ngày nghỉ → trừ thêm
-            $leaveBalance->used_leave += $diff;
-            $leaveBalance->remaining_leave = max(0, $leaveBalance->remaining_leave - $diff);
+            // Tăng số ngày nghỉ → trừ thêm, nhưng không vượt quá tổng phép
+            $leaveBalance->used_leave = min($leaveBalance->used_leave + $diff, $totalLeave);
+            $leaveBalance->remaining_leave = max(0, $totalLeave - $leaveBalance->used_leave);
         } elseif ($diff < 0) {
             // Giảm số ngày nghỉ → cộng lại số dư
-            $leaveBalance->used_leave += $diff; // diff < 0 nên sẽ trừ đi
-            $leaveBalance->remaining_leave -= $diff; // diff < 0 nên sẽ cộng lại
+            $leaveBalance->used_leave = max(0, $leaveBalance->used_leave + $diff); // diff < 0
+            $leaveBalance->remaining_leave = $totalLeave - $leaveBalance->used_leave;
         }
 
         $leaveBalance->save();
     }
+
 
 
 
