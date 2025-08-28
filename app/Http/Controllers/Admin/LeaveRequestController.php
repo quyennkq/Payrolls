@@ -71,7 +71,7 @@ class LeaveRequestController extends Controller
             'status' => 'nullable|string',
         ]);
 
-        $this->leaveRequestService->createLeaveRequest($request->all());
+        $this->leaveRequestService->createOrUpdateLeaveRequest($request->all());
         return redirect()->route('leave_request.index')->with('success', 'Thêm đơn xin nghỉ phép thành công');
     }
     public function edit($id)

@@ -8,16 +8,16 @@ use Carbon\Carbon;
 
 class LeaveRequestService
 {
-    public function createOrUpdateLeaveRequest(array $data, $id = null)
-    {
-        if ($id) {
-            $leave_request = LeaveRequestSalary::findOrFail($id);
-            $leave_request->update($data);
-            return $leave_request;
-        }
+    // public function createOrUpdateLeaveRequest(array $data, $id = null)
+    // {
+    //     if ($id) {
+    //         $leave_request = LeaveRequestSalary::findOrFail($id);
+    //         $leave_request->update($data);
+    //         return $leave_request;
+    //     }
 
-        return LeaveRequestSalary::create($data);
-    }
+    //     return LeaveRequestSalary::create($data);
+    // }
 
     /**
      * Handle the creation of a new leave request.
@@ -25,15 +25,62 @@ class LeaveRequestService
      * @param array $data
      * @return LeaveRequestSalary
      */
-    public function createLeaveRequest(array $data)
+    public function createOrUpdateLeaveRequest(array $data, $id = null)
     {
-        $leaveRequest = LeaveRequestSalary::create($data);
+        if ($id) {
+            $leaveRequest = LeaveRequestSalary::findOrFail($id);
 
-        // Update leave balance dựa trên số ngày nghỉ thực tế
+            // 1. Tính số ngày nghỉ cũ
+            $oldStart = Carbon::parse($leaveRequest->leave_date_start);
+            $oldEnd   = Carbon::parse($leaveRequest->leave_date_end);
+            $oldDays  = $oldEnd->diffInDays($oldStart) + 1;
+
+            // 2. Update request
+            $leaveRequest->update($data);
+
+            // 3. Tính số ngày nghỉ mới
+            $newStart = Carbon::parse($leaveRequest->leave_date_start);
+            $newEnd   = Carbon::parse($leaveRequest->leave_date_end);
+            $newDays  = $newEnd->diffInDays($newStart) + 1;
+
+            // 4. Cập nhật lại leave balance dựa trên chênh lệch
+            $this->adjustLeaveBalance($leaveRequest->employee_id, $oldDays, $newDays, $leaveRequest);
+
+            return $leaveRequest;
+        }
+
+
+        // Trường hợp tạo mới
+        $leaveRequest = LeaveRequestSalary::create($data);
         $this->updateLeaveBalance($leaveRequest->employee_id, $leaveRequest);
 
         return $leaveRequest;
     }
+
+    protected function adjustLeaveBalance(int $employeeId, int $oldDays, int $newDays, LeaveRequestSalary $leaveRequest)
+    {
+        $leaveBalance = LeaveBalanceSalary::where('employee_id', $employeeId)->first();
+
+        if (!$leaveBalance) {
+            return;
+        }
+
+        $diff = $newDays - $oldDays;
+
+        if ($diff > 0) {
+            // Tăng số ngày nghỉ → trừ thêm
+            $leaveBalance->used_leave += $diff;
+            $leaveBalance->remaining_leave = max(0, $leaveBalance->remaining_leave - $diff);
+        } elseif ($diff < 0) {
+            // Giảm số ngày nghỉ → cộng lại số dư
+            $leaveBalance->used_leave += $diff; // diff < 0 nên sẽ trừ đi
+            $leaveBalance->remaining_leave -= $diff; // diff < 0 nên sẽ cộng lại
+        }
+
+        $leaveBalance->save();
+    }
+
+
 
     /**
      * Update the leave balance for an employee.
@@ -53,7 +100,7 @@ class LeaveRequestService
 
             if ($days <= $leaveBalance->remaining_leave) {
                 // Đủ phép → trừ bình thường
-                $leaveBalance->used_leave     += $days;
+                $leaveBalance->used_leave += $days;
                 $leaveBalance->remaining_leave -= $days;
                 $leaveBalance->save();
             } else {
@@ -65,7 +112,7 @@ class LeaveRequestService
                 if ($paidDays > 0) {
                     $paidEnd = $start->copy()->addDays($paidDays - 1); // ngày cuối phần có phép
 
-                    $leaveBalance->used_leave     += $paidDays;
+                    $leaveBalance->used_leave += $paidDays;
                     $leaveBalance->remaining_leave = 0;
                     $leaveBalance->save();
 

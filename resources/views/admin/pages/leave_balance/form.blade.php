@@ -36,7 +36,7 @@
                                                 @foreach ($users as $user)
                                                     <option value="{{ $user->id }}"
                                                         {{ old('employee_id', $leave_balance->employee_id ?? '') == $user->id ? 'selected' : '' }}>
-                                                        {{ $user->username }}
+                                                        {{ $user->name }}
                                                     </option>
                                                 @endforeach
                                             </select>

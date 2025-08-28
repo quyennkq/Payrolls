@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Payroll;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PayrollService
@@ -44,11 +45,15 @@ class PayrollService
         } catch (\Exception $e) {
             throw new \Exception('Invalid month format, expected YYYY-MM-DD');
         }
-
+        // ngày nghỉ phép có hưởng lương
+        $leaveDays = 0;
         $allWorkDays = $employee->attendances()
             ->whereMonth('check_in', $monthCarbon->month)
             ->orderByDesc('id')
-            ->value('standard_working_days') ?? 1;
+            ->value('standard_working_days');
+
+        $allWorkDays = $allWorkDays ?: $monthCarbon->daysInMonth;
+
         $baseSalary = $employee->salaryPayments()->orderByDesc('id')->value('base_salary') ?? 0;
         $officialDays = $employee->attendances()
             ->whereMonth('check_in', $monthCarbon->month)
@@ -58,12 +63,15 @@ class PayrollService
             ->where('status', 'approved')
             ->where('leave_type', 'paid')
             ->where(function ($q) use ($monthCarbon) {
-                // Chọn những đơn có khoảng nghỉ giao với tháng đang tính
-                $q->whereMonth('leave_date_start', $monthCarbon->month)
-                    ->whereYear('leave_date_start', $monthCarbon->year)
-                    ->orWhereMonth('leave_date_end', $monthCarbon->month)
-                    ->orWhereYear('leave_date_end', $monthCarbon->year);
+                $q->where(function ($q2) use ($monthCarbon) {
+                    $q2->whereMonth('leave_date_start', $monthCarbon->month)
+                        ->whereYear('leave_date_start', $monthCarbon->year);
+                })->orWhere(function ($q2) use ($monthCarbon) {
+                    $q2->whereMonth('leave_date_end', $monthCarbon->month)
+                        ->whereYear('leave_date_end', $monthCarbon->year);
+                });
             })
+
             ->get();
 
         foreach ($leaveRequests as $leave) {
@@ -82,11 +90,15 @@ class PayrollService
             }
 
             $days = $start->diffInDays($end) + 1;
-            $officialDays += $days;
+            $leaveDays += $days;
         }
 
-        $baseSalaryByDays = $baseSalary * $officialDays / $allWorkDays;
+        // tổng ngày tính lương = ngày công đi làm + ngày nghỉ phép hợp lệ
+        $totalWorkDays = $officialDays > 0 ? ($officialDays + $leaveDays) : 0;
 
+
+        $baseSalaryByDays = $baseSalary * $totalWorkDays / $allWorkDays;
+        //dd($baseSalaryByDays, $totalWorkDays, $leaveDays);
         // Các khoản thu nhập
         $competency_salary = $employee->salaryPayments()->orderByDesc('id')->value('competency_salary') ?? 0;
         $performance_salary = $employee->salaryPayments()->orderByDesc('id')->value('performance_salary') ?? 0;
@@ -199,5 +211,36 @@ class PayrollService
     {
         $payroll = Payroll::findOrFail($id);
         $payroll->delete();
+    }
+
+    public function filter(Request $request)
+    {
+        $query = Payroll::query();
+
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
+
+        if ($request->filled('month')) {
+            $month = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $query->whereMonth('month', $month->month)
+                ->whereYear('month', $month->year);
+        }
+        if ($request->filled('form_date')) {
+            $query->whereDate('created_at', '>=', $request->form_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        //sắp xếp
+        $sort = $request->get('sort', 'asc');
+        $query->orderBy('month', $sort);
+
+        return $query->paginate(10);
     }
 }
