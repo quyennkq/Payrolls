@@ -10,12 +10,11 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <link rel="icon" href="<?php echo e(asset('themes/admin/img/kid-icon.png')); ?>">
+    <link rel="icon" href="<?php echo e(asset('themes/admin/img/credit/quyen1.jpg')); ?>">
 
 
     
     <?php echo $__env->make('admin.panels.styles', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-
     <?php echo $__env->yieldContent('style'); ?>
     <?php echo $__env->yieldPushContent('style'); ?>
 </head>

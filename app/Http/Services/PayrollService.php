@@ -17,19 +17,15 @@ class PayrollService
         $data = Excel::toArray(null, $file);
         foreach ($data[0] as $key => $row) {
             if ($key === 0) continue;
-
             $employee = Admin::with('salaryPayments', 'attendances', 'leaveRequests')->find($row[0]);
             if (!$employee) continue;
-
             $calculated = $this->calculatePayrollFields($employee, $row);
-
             Payroll::updateOrCreate(
                 ['employee_id' => $row[0], 'month' => $row[1]],
                 $calculated
             );
         }
     }
-
     // --- HÀM TÍNH TOÁN CHUNG ---
     protected function calculatePayrollFields(Admin $employee, array $row = [])
     {
@@ -38,7 +34,6 @@ class PayrollService
         if (!$month) {
             throw new \Exception('Month is required for payroll calculation');
         }
-
         try {
             // ép string -> Carbon
             $monthCarbon = Carbon::parse($month);
@@ -51,14 +46,11 @@ class PayrollService
             ->whereMonth('check_in', $monthCarbon->month)
             ->orderByDesc('id')
             ->value('standard_working_days');
-
         $allWorkDays = $allWorkDays ?: $monthCarbon->daysInMonth;
-
         $baseSalary = $employee->salaryPayments()->orderByDesc('id')->value('base_salary') ?? 0;
         $officialDays = $employee->attendances()
             ->whereMonth('check_in', $monthCarbon->month)
             ->orderByDesc('id')->value('official_days') ?? 0;
-
         $leaveRequests = $employee->leaveRequests()
             ->where('status', 'approved')
             ->where('leave_type', 'paid')
@@ -71,9 +63,7 @@ class PayrollService
                         ->whereYear('leave_date_end', $monthCarbon->year);
                 });
             })
-
             ->get();
-
         foreach ($leaveRequests as $leave) {
             $start = Carbon::parse($leave->leave_date_start);
             $end   = Carbon::parse($leave->leave_date_end);
@@ -96,9 +86,7 @@ class PayrollService
         // tổng ngày tính lương = ngày công đi làm + ngày nghỉ phép hợp lệ
         $totalWorkDays = $officialDays > 0 ? ($officialDays + $leaveDays) : 0;
 
-
         $baseSalaryByDays = $baseSalary * $totalWorkDays / $allWorkDays;
-        //dd($baseSalaryByDays, $totalWorkDays, $leaveDays);
         // Các khoản thu nhập
         $competency_salary = $employee->salaryPayments()->orderByDesc('id')->value('competency_salary') ?? 0;
         $performance_salary = $employee->salaryPayments()->orderByDesc('id')->value('performance_salary') ?? 0;
