@@ -22,26 +22,7 @@ class SalaryPaymentController extends Controller
     public function index(Request $request)
     {
 
-       $query = SalaryPayment::query();
-
-        // lọc theo mã nhân viên
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
-        //lọc theo khoảng ngày
-        if ($request->filled('date')) {
-            $query->whereDate('leave_date', '=', $request->form_date);
-        }
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        //sắp xếp
-        // $sort = $request->get('sort', 'asc');
-        // $query->orderBy('leave_date', $sort);
-
-        $rows = $query->paginate(10);
+        $rows = $this->salaryPaymentService->filter($request);
         $this->responseData['rows'] = $rows;
         return $this->responseView($this->viewPart . '.index', $this->responseData);
     }

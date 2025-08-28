@@ -24,33 +24,7 @@ class LeaveRequestController extends Controller
 
     public function index(Request $request)
     {
-        $query = LeaveRequestSalary::query();
-
-        // lọc theo mã nhân viên
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
-        if ($request->filled('month')) {
-            $month = Carbon::parse($request->month);
-            $query->whereMonth('leave_date_start', $month->month)
-                ->whereYear('leave_date_start', $month->year);
-        }
-          if ($request->filled('form_date')) {
-            $query->whereDate('created_at', '>=', $request->form_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        //sắp xếp
-        // $sort = $request->get('sort', 'asc');
-        // $query->orderBy('leave_date', $sort);
-
-        $rows = $query->paginate(10);
+        $rows = $this->leaveRequestService->filter($request);
         $this->responseData['rows'] = $rows;
         return $this->responseView($this->viewPart . '.index', $this->responseData);
     }

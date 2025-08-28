@@ -21,32 +21,7 @@ class AttendanceController extends Controller
     }
     public function index(Request $request)
     {
-        $query = AttendanceEmployee::query();
-        if ($request->filled('month')) {
-            $month = Carbon::parse($request->month);
-            $query->whereMonth('check_in', $month->month)
-                ->whereYear('check_in', $month->year);
-        }
-
-        // lọc theo mã nhân viên
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
-        // lọc theo khoảng ngày
-        if ($request->filled('form_date')) {
-            $query->whereDate('check_in', '>=', $request->form_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('check_in', '<=', $request->to_date);
-        }
-
-        //sắp xếp
-        $sort = $request->get('sort', 'asc');
-        $query->orderBy('check_in', $sort);
-
-        //$attendances = $query->paginate(20);
-        $rows = $query->paginate(10)->appends($request->all());
+        $rows = $this->attendanceService->filter($request);
         $attendances = AttendanceEmployee::with('admin')->get();
         $this->responseData['rows'] = $rows;
         $this->responseData['attendances'] = $attendances;
